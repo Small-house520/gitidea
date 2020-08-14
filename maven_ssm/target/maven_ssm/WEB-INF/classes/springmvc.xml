@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--  开启注解扫描  -->
+    <context:component-scan base-package="cn.edu.dgut.web"></context:component-scan>
+    <!-- 将配置好的自定义转换器挂载 -->
+    <mvc:annotation-driven conversion-service="dateConversionService"></mvc:annotation-driven>
+
+    <!--配置自定义转换器 -->
+    <bean name="dateConversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="cn.edu.dgut.util.StrDateConveter"></bean>
+            </set>
+        </property>
+    </bean>
+
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+    <!-- 配置文件上传组件（name必须是multipartResolver，且不能省略） -->
+    <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 配置上传文件大小（字节） -->
+        <property name="maxUploadSize" value="5242880"></property>
+    </bean>
+
+    <!-- 配置异常全局异常处理 -->
+    <bean class="cn.edu.dgut.util.MyHandlerExceptionResolver"></bean>
+
+    <!-- 针对所有mapping配置全局拦截器 -->
+    <mvc:interceptors>
+        <!-- 有多个拦截器的话，按顺序执行 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <!-- <bean class="cn.edu.dgut.util.MyHandlerInterceptor"></bean>-->
+            <bean class="cn.edu.dgut.util.UserHandlerInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!-- 针对某种mapping配置拦截器 -->
+    <!--<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="myHandlerInterceptor"></ref>
+            </list>
+        </property>
+    </bean>
+    <bean name="myHandlerInterceptor" class="cn.edu.dgut.util.MyHandlerInterceptor"></bean>-->
+</beans>        
+
+
